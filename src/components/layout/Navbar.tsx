@@ -1,5 +1,5 @@
 import { useLocation } from 'react-router-dom'
-import { User, LogOut, Menu, X } from 'lucide-react'
+import { User, LogOut, Menu } from 'lucide-react'
 
 interface NavbarProps {
   onMenuClick: () => void
