@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { Plus } from 'lucide-react'
-import AlbumList from '../../components/manage-gallery/AlbumList'
+import GroupList from '../../components/manage-gallery/GroupList'
 import AlbumForm from '../../components/manage-gallery/AlbumForm'
 import Modal from '../../components/Modal'
 
 export default function ManageGallery() {
   const [isFormOpen, setIsFormOpen] = useState(false)
+  const [refreshKey, setRefreshKey] = useState(0)
 
   return (
     <div className="space-y-6">
@@ -25,7 +26,7 @@ export default function ManageGallery() {
               <span>Create Album</span>
             </button>
           </div>
-          <AlbumList />
+          <GroupList refreshSignal={refreshKey} />
         </div>
         <div className="p-6 hidden lg:block">
           {/* layout balance */}
@@ -37,7 +38,7 @@ export default function ManageGallery() {
         onClose={() => setIsFormOpen(false)}
         title="Create New Album"
       >
-        <AlbumForm onClose={() => setIsFormOpen(false)} />
+        <AlbumForm onClose={() => setIsFormOpen(false)} onSaved={() => setRefreshKey(k => k + 1)} />
       </Modal>
     </div>
   )

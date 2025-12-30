@@ -2,15 +2,33 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Lock, Mail, LogIn } from 'lucide-react'
 import logo from '../../assets/logo.jpeg'
+import { login, setToken } from '../../api'
+import Spinner from '../../components/Spinner'
+import { useToast } from '../../components/Toast'
 
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const navigate = useNavigate()
+  const toast = useToast()
+  const [loading, setLoading] = useState(false)
 
   function submit(e: React.FormEvent) {
     e.preventDefault()
-    if (email && password) navigate('/')
+    if (!email || !password) return
+
+    setLoading(true)
+    login(email, password)
+      .then((data: any) => {
+        const token = data?.access_token
+        if (token) {
+          localStorage.setItem('admin_token', token)
+          setToken(token)
+        }
+        navigate('/')
+      })
+      .catch(() => toast.show('Login failed', 'error'))
+      .finally(() => setLoading(false))
   }
 
   return (
@@ -56,9 +74,9 @@ export default function Login() {
           </div>
 
           {/* Submit Button */}
-          <button type="submit" className="w-full py-3 bg-linear-to-r from-[#093FB4] to-blue-700 rounded-lg font-semibold flex items-center justify-center space-x-2 hover:shadow-lg transition text-white">
-            <LogIn size={20} />
-            <span>Sign In</span>
+          <button disabled={loading} type="submit" className="w-full py-3 bg-linear-to-r from-[#093FB4] to-blue-700 rounded-lg font-semibold flex items-center justify-center space-x-2 hover:shadow-lg transition text-white disabled:opacity-60">
+            {loading ? <Spinner size={18} /> : <LogIn size={20} />}
+            <span>{loading ? 'Signing in...' : 'Sign In'}</span>
           </button>
         </form>
       </div>
