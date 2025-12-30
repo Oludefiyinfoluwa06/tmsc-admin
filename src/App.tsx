@@ -5,6 +5,7 @@ import ManageProducts from './pages/ManageProducts'
 import ManageGallery from './pages/ManageGallery'
 import MainLayout from './components/layout/MainLayout'
 import { ToastProvider } from './components/Toast'
+import RequireAuth from './components/layout/RequireAuth'
 
 function App() {
   return (
@@ -12,7 +13,7 @@ function App() {
       <ToastProvider>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/" element={<MainLayout />}>
+          <Route path="/" element={<RequireAuth><MainLayout /></RequireAuth>}>
             <Route index element={<Dashboard />} />
             <Route path="products" element={<ManageProducts />} />
             <Route path="gallery" element={<ManageGallery />} />

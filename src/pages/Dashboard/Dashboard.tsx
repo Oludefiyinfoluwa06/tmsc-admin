@@ -1,7 +1,55 @@
 import { BarChart3, Package, Images } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { fetchDashboardMetrics, fetchProducts, fetchGalleryGroups } from '../../api'
 
 export default function Dashboard() {
+  const [productsCount, setProductsCount] = useState<number | null>(null)
+  const [galleriesCount, setGalleriesCount] = useState<number | null>(null)
+  const [statsCount, setStatsCount] = useState<number | null>(null)
+
+  useEffect(() => {
+    let mounted = true
+
+    fetchDashboardMetrics()
+      .then((metrics: any) => {
+        if (!mounted) return
+        if (metrics && (metrics.productsCount || metrics.galleriesCount || metrics.totalItems)) {
+          setProductsCount(metrics.productsCount ?? null)
+          setGalleriesCount(metrics.galleriesCount ?? null)
+          setStatsCount(metrics.totalItems ?? ( (metrics.productsCount ?? 0) + (metrics.galleriesCount ?? 0) ))
+          return
+        }
+
+        // fallback: fetch lists and compute counts
+        Promise.all([fetchProducts(), fetchGalleryGroups()])
+          .then(([products, groups]: any) => {
+            if (!mounted) return
+            const pCount = Array.isArray(products) ? products.length : (products?.length || 0)
+            const gCount = Array.isArray(groups) ? groups.length : (groups?.length || 0)
+            setProductsCount(pCount)
+            setGalleriesCount(gCount)
+            setStatsCount(pCount + gCount)
+          })
+          .catch(() => {
+            if (!mounted) return
+            setProductsCount(0)
+            setGalleriesCount(0)
+            setStatsCount(0)
+          })
+      })
+      .catch(() => {
+        if (!mounted) return
+        setProductsCount(0)
+        setGalleriesCount(0)
+        setStatsCount(0)
+      })
+
+    return () => { mounted = false }
+  }, [])
+
+  const display = (v: number | null, fallback: number) => (v === null ? fallback : v)
+
   return (
     <div className="space-y-8">
       <header>
@@ -13,7 +61,7 @@ export default function Dashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-400 text-sm font-semibold">Products</p>
-              <h3 className="text-2xl font-bold mt-2">2</h3>
+              <h3 className="text-2xl font-bold mt-2">{display(productsCount, 0)}</h3>
               <p className="text-xs text-gray-500 mt-1">Manage inventory packs</p>
             </div>
             <div className="p-3 bg-linear-to-br from-[#093FB4] to-blue-700 rounded-lg">
@@ -26,7 +74,7 @@ export default function Dashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-400 text-sm font-semibold">Galleries</p>
-              <h3 className="text-2xl font-bold mt-2">2</h3>
+              <h3 className="text-2xl font-bold mt-2">{display(galleriesCount, 0)}</h3>
               <p className="text-xs text-gray-500 mt-1">Albums and images</p>
             </div>
             <div className="p-3 bg-linear-to-br from-[#DC2626] to-[#B21C1C] rounded-lg">
@@ -39,7 +87,7 @@ export default function Dashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-400 text-sm font-semibold">Statistics</p>
-              <h3 className="text-2xl font-bold mt-2">4</h3>
+              <h3 className="text-2xl font-bold mt-2">{display(statsCount, 0)}</h3>
               <p className="text-xs text-gray-500 mt-1">Total items managed</p>
             </div>
             <div className="p-3 bg-linear-to-br from-[#DC2626] via-[#0b47d3] to-[#093FB4] rounded-lg">
