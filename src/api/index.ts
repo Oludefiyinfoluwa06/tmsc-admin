@@ -64,6 +64,16 @@ export async function fetchProducts() {
   return res.data
 }
 
+export async function fetchDashboardMetrics() {
+  try {
+    const res = await api.get('/admin/metrics')
+    return res.data
+  } catch (err) {
+    // fallback: not all backends expose /admin/metrics
+    return null
+  }
+}
+
 export async function fetchProduct(id: string) {
   const res = await api.get(`/admin/products/${id}`)
   console.log('fetchProduct', res)

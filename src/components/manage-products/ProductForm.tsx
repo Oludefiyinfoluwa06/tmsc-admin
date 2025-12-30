@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
-import { Plus, Upload } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Plus } from 'lucide-react'
 import Spinner from '../Spinner'
 import { useToast } from '../Toast'
 import { createProduct, updateProduct } from '../../api'
@@ -15,26 +15,26 @@ export default function ProductForm({ onClose, initialData, onSaved }: ProductFo
   const [slug, setSlug] = useState('MODOOLA')
   const [description, setDescription] = useState('')
   const [loading, setLoading] = useState(false)
-  const fileRef = useRef<HTMLInputElement | null>(null)
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
-  const [previews, setPreviews] = useState<string[]>([])
-  const [images, setImages] = useState<string[]>([])
+  // const fileRef = useRef<HTMLInputElement | null>(null)
+  // const [selectedFiles, setSelectedFiles] = useState<File[]>([])
+  // const [previews, setPreviews] = useState<string[]>([])
+  // const [images, setImages] = useState<string[]>([])
   const toast = useToast()
 
   useEffect(() => {
     if (initialData) {
       setTitle(initialData.title || '')
       setDescription(initialData.description || '')
-      setImages(Array.isArray(initialData.images) ? initialData.images : [])
+      // setImages(Array.isArray(initialData.images) ? initialData.images : [])
       setSlug(initialData.slug || initialData.productType || 'MODOOLA')
     }
   }, [initialData])
 
-  useEffect(() => {
-    const objectUrls = selectedFiles.map(f => URL.createObjectURL(f))
-    setPreviews(objectUrls)
-    return () => { objectUrls.forEach(u => URL.revokeObjectURL(u)) }
-  }, [selectedFiles])
+  // useEffect(() => {
+  //   const objectUrls = selectedFiles.map(f => URL.createObjectURL(f))
+  //   setPreviews(objectUrls)
+  //   return () => { objectUrls.forEach(u => URL.revokeObjectURL(u)) }
+  // }, [selectedFiles])
 
   async function submit(e: React.FormEvent) {
     e.preventDefault()
@@ -48,9 +48,9 @@ export default function ProductForm({ onClose, initialData, onSaved }: ProductFo
       form.append('title', title)
       form.append('description', description)
 
-      if (images && images.length) {
-        images.forEach(img => form.append('images[]', img))
-      }
+      // if (images && images.length) {
+      //   images.forEach(img => form.append('images[]', img))
+      // }
 
       if (initialData?.id) {
         await updateProduct(initialData.id, form)
@@ -70,20 +70,20 @@ export default function ProductForm({ onClose, initialData, onSaved }: ProductFo
     }
   }
 
-  function handleFiles(e: React.ChangeEvent<HTMLInputElement>) {
-    const files = e.target.files
-    if (files && files.length) setSelectedFiles(Array.from(files))
-  }
+  // function handleFiles(e: React.ChangeEvent<HTMLInputElement>) {
+  //   const files = e.target.files
+  //   if (files && files.length) setSelectedFiles(Array.from(files))
+  // }
 
-  function removeImage(idx: number) {
-    setImages(prev => prev.filter((_, i) => i !== idx))
-  }
+  // function removeImage(idx: number) {
+  //   setImages(prev => prev.filter((_, i) => i !== idx))
+  // }
 
-  function removeSelectedFile(idx: number) {
-    const url = previews[idx]
-    if (url) URL.revokeObjectURL(url)
-    setSelectedFiles(s => s.filter((_, i) => i !== idx))
-  }
+  // function removeSelectedFile(idx: number) {
+  //   const url = previews[idx]
+  //   if (url) URL.revokeObjectURL(url)
+  //   setSelectedFiles(s => s.filter((_, i) => i !== idx))
+  // }
 
   return (
     <form onSubmit={submit} className="space-y-5">
@@ -109,7 +109,7 @@ export default function ProductForm({ onClose, initialData, onSaved }: ProductFo
         <textarea value={description} onChange={e => setDescription(e.target.value)} className="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 focus:border-[#093FB4] focus:ring-2 focus:ring-[#093FB4]/20 focus:outline-none transition resize-none" rows={3} />
       </div>
 
-      <div>
+      {/* <div>
         <label className="block text-sm text-gray-300 mb-2 font-medium">Upload Images</label>
         <div
           onClick={() => fileRef.current?.click()}
@@ -125,7 +125,6 @@ export default function ProductForm({ onClose, initialData, onSaved }: ProductFo
           <p className="text-sm text-gray-400">Click or drag to upload</p>
         </div>
 
-        {/* Previews */}
         {images.length > 0 && (
           <div className="mt-3 grid grid-cols-4 gap-3">
             {images.map((src, i) => (
@@ -147,7 +146,6 @@ export default function ProductForm({ onClose, initialData, onSaved }: ProductFo
           </div>
         )}
 
-
         {selectedFiles.length > 0 && (
           <div className="mt-3 space-y-2">
             {selectedFiles.map((f, idx) => (
@@ -164,7 +162,7 @@ export default function ProductForm({ onClose, initialData, onSaved }: ProductFo
             ))}
           </div>
         )}
-      </div>
+      </div> */}
 
       <div className="flex space-x-3">
         <button type="submit" disabled={loading} className="flex-1 py-3 bg-linear-to-r from-[#DC2626] to-[#B21C1C] rounded-lg font-semibold flex items-center justify-center space-x-2 hover:shadow-lg transition shadow-md disabled:opacity-50">
