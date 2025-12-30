@@ -11,7 +11,7 @@ export default function ManageGallery() {
   return (
     <div className="space-y-6">
       <header>
-        <p className="text-gray-400 mt-2">Create albums and upload images for product and project showcases.</p>
+        <p className="text-gray-400 mt-2">Create albums and upload images for project showcases.</p>
       </header>
 
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
