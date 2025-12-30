@@ -46,7 +46,7 @@ export default function ProductViewer({ productId, onClose }: { productId: strin
                   {product.images.map((img: string, i: number) => {
                     const src = img.startsWith('http') ? img : `${import.meta.env.VITE_API_BASE_URL}${img}`
                     return (
-                      <div key={i} className="flex-shrink-0 w-80 h-56 bg-gray-800 rounded overflow-hidden">
+                      <div key={i} className="shrink-0 w-80 h-56 bg-gray-800 rounded overflow-hidden">
                         <img src={src} alt={`${product.title}-${i}`} className="w-full h-full object-cover" />
                       </div>
                     )

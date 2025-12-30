@@ -39,7 +39,7 @@ export default function GalleryViewer({ groupId, title, onClose }: { groupId: st
                 const src = `${import.meta.env.VITE_API_BASE_URL}${img.imageUrl}`
                 console.log({ src })
                 return (
-                  <div key={i} className="flex-shrink-0 w-80 h-56 bg-gray-800 rounded overflow-hidden" style={{ scrollSnapAlign: 'center' }}>
+                  <div key={i} className="shrink-0 w-80 h-56 bg-gray-800 rounded overflow-hidden" style={{ scrollSnapAlign: 'center' }}>
                     <img src={src} alt={img?.caption || `img-${i}`} className="w-full h-full object-cover" />
                   </div>
                 )
