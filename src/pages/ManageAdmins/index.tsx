@@ -41,8 +41,7 @@ export default function ManageAdmins() {
       const data = await fetchAdmins()
       // expect array of users
       setAdmins(data || [])
-    } catch (err) {
-      console.error(err)
+    } catch {
       toast.show('Failed to fetch admins', 'error')
     } finally {
       setLoading(false)
@@ -84,8 +83,7 @@ export default function ManageAdmins() {
       }
       setModalOpen(false)
       await load()
-    } catch (err) {
-      console.error(err)
+    } catch {
       toast.show('Save failed', 'error')
     } finally {
       setSaving(false)
@@ -98,8 +96,7 @@ export default function ManageAdmins() {
       await deleteAdmin(id)
       toast.show('Admin deleted', 'success')
       await load()
-    } catch (err) {
-      console.error(err)
+    } catch {
       toast.show('Delete failed', 'error')
     }
   }

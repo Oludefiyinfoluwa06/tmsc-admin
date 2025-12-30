@@ -63,6 +63,7 @@ export async function fetchProduct(id: string) {
 }
 
 export async function createProduct(payload: any) {
+  console.log({ createProductPayload: payload })
   const res = await api.post('/admin/products', payload)
   return res.data
 }
@@ -97,12 +98,8 @@ export async function uploadGalleryFiles(files: FileList | File[]) {
   const form = new FormData()
   const list: File[] = Array.from(files as any)
   list.forEach((f: File) => form.append('files', f))
-  try {
-    const res = await api.post('/upload/gallery', form)
-    return res.data
-  } catch (error) {
-    console.log('Upload error', error)
-  }
+  const res = await api.post('/upload/gallery', form)
+  return res.data
 }
 
 export async function fetchAdmins() {

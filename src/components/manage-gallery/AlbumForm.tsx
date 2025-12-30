@@ -78,7 +78,7 @@ export default function AlbumForm({ onClose, initialData, onSaved }: AlbumFormPr
       setPreviews([])
       setInitialPreview(null)
       onClose()
-    } catch (err) {
+    } catch {
       toast.show('Upload or save failed', 'error')
     } finally {
       setLoading(false)

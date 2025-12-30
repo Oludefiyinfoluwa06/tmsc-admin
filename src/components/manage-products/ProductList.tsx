@@ -29,8 +29,7 @@ export default function ProductList({ refreshSignal }: { refreshSignal?: number 
           order: typeof p.order === 'number' ? p.order : undefined,
         }))
         setItems(list)
-      } catch (err) {
-        console.error('Failed to load products', err)
+      } catch {
         setItems([])
       } finally {
         setLoading(false)
@@ -48,9 +47,8 @@ export default function ProductList({ refreshSignal }: { refreshSignal?: number 
         await deleteProduct(id)
         setItems(items.filter(i => i.id !== id))
         toast.show('Product removed', 'success')
-      } catch (err) {
+      } catch {
         // fallback to local remove on error
-        console.error('Delete failed', err)
         setItems(items.filter(i => i.id !== id))
         toast.show('Product removed locally', 'info')
       }
