@@ -47,7 +47,7 @@ export default function AlbumForm({ onClose, initialData, onSaved }: AlbumFormPr
         await updateGalleryGroup(initialData.id, { title, description })
         toast.show('Album updated', 'success')
       } else {
-        const groupRes: any = await createGalleryGroup({ title, description, productType: 'MODOOLA', order: 0 })
+        const groupRes: any = await createGalleryGroup({ title, description, order: 0 })
         // try to extract id from response
         groupId = groupRes?.id || groupRes?._id || groupRes?.data?.id
         if (!groupId && groupRes && typeof groupRes === 'string') groupId = groupRes
@@ -61,7 +61,7 @@ export default function AlbumForm({ onClose, initialData, onSaved }: AlbumFormPr
         const arr = Array.isArray(uploaded) ? uploaded : [uploaded]
         for (const item of arr) {
           const imageUrl = item?.url || item?.path || item || null
-          await createGalleryImage('MODOOLA', {
+          await createGalleryImage({
             imageUrl: imageUrl || '/uploads/gallery/sample-image.jpg',
             caption: title,
             description,

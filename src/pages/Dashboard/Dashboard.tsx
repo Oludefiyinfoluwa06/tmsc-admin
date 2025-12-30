@@ -1,7 +1,7 @@
 import { BarChart3, Package, Images } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { fetchDashboardMetrics, fetchProducts, fetchGalleryGroups } from '../../api'
+import { fetchProducts, fetchGalleryGroups } from '../../api'
 
 export default function Dashboard() {
   const [productsCount, setProductsCount] = useState<number | null>(null)
@@ -11,32 +11,14 @@ export default function Dashboard() {
   useEffect(() => {
     let mounted = true
 
-    fetchDashboardMetrics()
-      .then((metrics: any) => {
+    Promise.all([fetchProducts(), fetchGalleryGroups()])
+      .then(([products, groups]: any) => {
         if (!mounted) return
-        if (metrics && (metrics.productsCount || metrics.galleriesCount || metrics.totalItems)) {
-          setProductsCount(metrics.productsCount ?? null)
-          setGalleriesCount(metrics.galleriesCount ?? null)
-          setStatsCount(metrics.totalItems ?? ( (metrics.productsCount ?? 0) + (metrics.galleriesCount ?? 0) ))
-          return
-        }
-
-        // fallback: fetch lists and compute counts
-        Promise.all([fetchProducts(), fetchGalleryGroups()])
-          .then(([products, groups]: any) => {
-            if (!mounted) return
-            const pCount = Array.isArray(products) ? products.length : (products?.length || 0)
-            const gCount = Array.isArray(groups) ? groups.length : (groups?.length || 0)
-            setProductsCount(pCount)
-            setGalleriesCount(gCount)
-            setStatsCount(pCount + gCount)
-          })
-          .catch(() => {
-            if (!mounted) return
-            setProductsCount(0)
-            setGalleriesCount(0)
-            setStatsCount(0)
-          })
+        const pCount = Array.isArray(products) ? products.length : (products?.length || 0)
+        const gCount = Array.isArray(groups) ? groups.length : (groups?.length || 0)
+        setProductsCount(pCount)
+        setGalleriesCount(gCount)
+        setStatsCount(pCount + gCount)
       })
       .catch(() => {
         if (!mounted) return

@@ -75,6 +75,17 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             <Images size={20} />
             <span className="font-medium">Manage Gallery</span>
           </Link>
+
+          <Link
+            to="/admins"
+            onClick={onClose}
+            className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition ${
+              isActive('/admins') ? 'bg-[#093FB4] text-white' : 'text-gray-300 hover:bg-gray-800'
+            }`}
+          >
+            <Package size={20} />
+            <span className="font-medium">Manage Admins</span>
+          </Link>
         </nav>
 
         {/* Logout Button */}

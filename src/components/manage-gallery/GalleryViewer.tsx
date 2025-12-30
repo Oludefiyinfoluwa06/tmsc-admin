@@ -37,7 +37,6 @@ export default function GalleryViewer({ groupId, title, onClose }: { groupId: st
             <div ref={containerRef} className="flex gap-3 overflow-x-auto py-4 scrollbar-hide" style={{ scrollSnapType: 'x mandatory' }}>
               {images.map((img, i) => {
                 const src = `${import.meta.env.VITE_API_BASE_URL}${img.imageUrl}`
-                console.log({ src })
                 return (
                   <div key={i} className="shrink-0 w-80 h-56 bg-gray-800 rounded overflow-hidden" style={{ scrollSnapAlign: 'center' }}>
                     <img src={src} alt={img?.caption || `img-${i}`} className="w-full h-full object-cover" />
