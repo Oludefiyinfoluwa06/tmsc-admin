@@ -31,7 +31,7 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
         className="bg-gray-800 rounded-2xl border border-gray-700 shadow-2xl max-w-lg w-full overflow-hidden transform transition-all duration-200 scale-100 flex flex-col max-h-[90vh]"
         onClick={e => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between p-5 bg-linear-to-r from-[#DC2626] via-[#0b47d3] to-[#093FB4] flex-shrink-0">
+        <div className="flex items-center justify-between p-5 bg-linear-to-r from-[#DC2626] via-[#0b47d3] to-[#093FB4] shrink-0">
           <h2 className="text-lg font-semibold text-white">{title}</h2>
           <button
             onClick={onClose}

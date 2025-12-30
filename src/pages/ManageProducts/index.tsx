@@ -6,6 +6,7 @@ import Modal from '../../components/Modal'
 
 export default function ManageProducts() {
   const [isFormOpen, setIsFormOpen] = useState(false)
+  const [refreshKey, setRefreshKey] = useState(0)
 
   return (
     <div className="space-y-6">
@@ -25,7 +26,7 @@ export default function ManageProducts() {
               <span>Add Product</span>
             </button>
           </div>
-          <ProductList />
+          <ProductList refreshSignal={refreshKey} />
         </div>
         <div className="p-6 hidden lg:block">
           {/* empty aside preserved for layout balance */}
@@ -37,7 +38,7 @@ export default function ManageProducts() {
         onClose={() => setIsFormOpen(false)}
         title="Add New Product"
       >
-        <ProductForm onClose={() => setIsFormOpen(false)} />
+        <ProductForm onClose={() => setIsFormOpen(false)} onSaved={() => { setRefreshKey(k => k + 1) }} />
       </Modal>
     </div>
   )
