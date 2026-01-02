@@ -12,7 +12,7 @@ export default function GalleryViewer({ groupId, title, onClose }: { groupId: st
   useEffect(() => {
     if (!groupId) return
     setLoading(true)
-    fetchGalleryImages('MODOOLA', groupId)
+    fetchGalleryImages(groupId)
       .then((res: any) => setImages(res || []))
       .catch(() => setImages([]))
       .finally(() => setLoading(false))

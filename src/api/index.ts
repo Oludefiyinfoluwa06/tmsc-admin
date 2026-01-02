@@ -18,10 +18,8 @@ export async function login(email: string, password: string) {
 }
 
 // Gallery images (admin)
-export async function fetchGalleryImages(productType = 'MODOOLA', groupId?: string) {
-  const params: any = {}
-  if (groupId) params.groupId = groupId
-  const res = await api.get(`/admin/gallery/${productType}`, { params })
+export async function fetchGalleryImages(groupId?: string) {
+  const res = await api.get(`/admin/gallery?groupId=${groupId}`)
   return res.data
 }
 
@@ -63,7 +61,6 @@ export async function fetchProduct(id: string) {
 }
 
 export async function createProduct(payload: any) {
-  console.log({ createProductPayload: payload })
   const res = await api.post('/admin/products', payload)
   return res.data
 }
@@ -98,7 +95,11 @@ export async function uploadGalleryFiles(files: FileList | File[]) {
   const form = new FormData()
   const list: File[] = Array.from(files as any)
   list.forEach((f: File) => form.append('files', f))
-  const res = await api.post('/upload/gallery', form)
+  const res = await api.post('/upload/gallery', form, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
   return res.data
 }
 
