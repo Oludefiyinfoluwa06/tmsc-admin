@@ -4,6 +4,7 @@ import Login from './pages/Login/Login'
 import ManageProducts from './pages/ManageProducts'
 import ManageGallery from './pages/ManageGallery'
 import ManageAdmins from './pages/ManageAdmins'
+import ManageCenters from './pages/ModularCenters'
 import MainLayout from './components/layout/MainLayout'
 import { ToastProvider } from './components/Toast'
 import RequireAuth from './components/layout/RequireAuth'
@@ -18,6 +19,7 @@ function App() {
             <Route index element={<Dashboard />} />
             <Route path="products" element={<ManageProducts />} />
             <Route path="gallery" element={<ManageGallery />} />
+            <Route path="centers" element={<ManageCenters />} />
             <Route path="admins" element={<ManageAdmins />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />

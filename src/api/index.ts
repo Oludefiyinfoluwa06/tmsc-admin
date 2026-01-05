@@ -132,4 +132,25 @@ export async function deleteAdmin(id: string) {
   return res.data
 }
 
+// Modular centers (public endpoints)
+export async function fetchCenters() {
+  const res = await api.get('/centers')
+  return res.data
+}
+
+export async function createCenter(payload: any) {
+  const res = await api.post('/centers', payload)
+  return res.data
+}
+
+export async function updateCenter(id: string, payload: any) {
+  const res = await api.put(`/centers/${id}`, payload)
+  return res.data
+}
+
+export async function deleteCenter(id: string) {
+  const res = await api.delete(`/centers/${id}`)
+  return res.data
+}
+
 export default api
