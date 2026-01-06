@@ -174,6 +174,28 @@ export async function addCenterImage(centerId: string, payload: any) {
   }
 }
 
+// Upload a single image file for a center using multipart/form-data
+export async function uploadCenterImage(centerId: string, file: File, payload: any = {}) {
+  try {
+    const form = new FormData()
+    form.append('file', file)
+    if (payload.caption !== undefined) form.append('caption', String(payload.caption))
+    if (payload.type !== undefined) form.append('type', String(payload.type))
+    if (payload.order !== undefined) form.append('order', String(payload.order))
+    form.append('isActive', String(payload.isActive))
+    if (payload.imageUrl !== undefined) form.append('imageUrl', String(payload.imageUrl))
+
+    const res = await api.post(`/admin/modular-centers/${centerId}/images`, form, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+    return res.data
+  } catch (error) {
+    console.log({ createCenterImageUploadError: error })
+  }
+}
+
 export async function updateCenterImage(centerId: string, imageId: string, payload: any) {
   const res = await api.put(`/admin/modular-centers/${centerId}/images/${imageId}`, payload)
   return res.data
