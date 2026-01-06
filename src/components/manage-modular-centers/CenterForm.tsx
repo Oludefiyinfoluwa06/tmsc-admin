@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Upload } from 'lucide-react'
 import Spinner from '../Spinner'
 import { useToast } from '../Toast'
-import { createCenter, updateCenter, uploadGalleryFiles } from '../../api'
+import { createCenter, updateCenter, uploadGalleryFiles, addCenterImage } from '../../api'
 
 interface CenterFormProps {
   onClose: () => void
@@ -11,33 +11,22 @@ interface CenterFormProps {
 }
 
 export default function CenterForm({ onClose, initialData, onSaved }: CenterFormProps) {
-  const [name, setName] = useState('')
   const [location, setLocation] = useState('')
   const [description, setDescription] = useState('')
+  const [title, setTitle] = useState('')
   const fileRef = useRef<HTMLInputElement | null>(null)
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const [previews, setPreviews] = useState<string[]>([])
   const [initialPreview, setInitialPreview] = useState<string | null>(null)
-  // training info (optional)
-  const [showTraining, setShowTraining] = useState(false)
-  const [trainingTitle, setTrainingTitle] = useState('')
-  const [trainingSchedule, setTrainingSchedule] = useState('')
-  const [trainingDetails, setTrainingDetails] = useState('')
   const [loading, setLoading] = useState(false)
   const toast = useToast()
 
   useEffect(() => {
     if (initialData) {
-      setName(initialData.name || '')
+      setTitle(initialData.title || '')
       setLocation(initialData.location || '')
       setDescription(initialData.description || '')
       if (initialData.imageUrl) setInitialPreview(initialData.imageUrl)
-      if (initialData.training) {
-        setShowTraining(true)
-        setTrainingTitle(initialData.training.title || '')
-        setTrainingSchedule(initialData.training.schedule || '')
-        setTrainingDetails(initialData.training.details || '')
-      }
     }
   }, [initialData])
 
@@ -49,39 +38,39 @@ export default function CenterForm({ onClose, initialData, onSaved }: CenterForm
 
   async function submit(e: React.FormEvent) {
     e.preventDefault()
-    if (!name) return toast.show('Name is required', 'error')
+    if (!title) return toast.show('Title is required', 'error')
 
     setLoading(true)
     try {
-      const payload: any = { name, location, description }
+      const payload: any = { title, location, description }
 
-      // handle image upload if files selected
-      const files = selectedFiles.length ? selectedFiles : fileRef.current?.files
-      if (files && (files as any).length > 0) {
-        const uploaded: any = await uploadGalleryFiles(files as any)
-        const arr = Array.isArray(uploaded) ? uploaded : [uploaded]
-        const first = arr[0]
-        const imageUrl = first?.url || first?.path || first || null
-        if (imageUrl) payload.imageUrl = imageUrl
-      } else if (initialPreview) {
-        payload.imageUrl = initialPreview
-      }
-
-      // attach training info if provided
-      if (showTraining && (trainingTitle || trainingSchedule || trainingDetails)) {
-        payload.training = {
-          title: trainingTitle,
-          schedule: trainingSchedule,
-          details: trainingDetails,
-        }
-      }
+      let centerId: string | null = null
 
       if (initialData?.id) {
         await updateCenter(initialData.id, payload)
+        centerId = initialData.id
         toast.show('Center updated', 'success')
       } else {
-        await createCenter(payload)
+        const created: any = await createCenter(payload)
+        centerId = created?.id || created?._id || null
         toast.show('Center created', 'success')
+      }
+
+      // After creating/updating, upload images (if any) and attach to center
+      const files = selectedFiles.length ? selectedFiles : fileRef.current?.files
+      if (centerId && files && (files as any).length > 0) {
+        const uploaded: any = await uploadGalleryFiles(files as any)
+        const arr = Array.isArray(uploaded) ? uploaded : [uploaded]
+        for (const first of arr) {
+          const imageUrl = first?.url || first?.path || first || null
+          if (imageUrl) {
+            try {
+              await addCenterImage(centerId, { imageUrl, caption: '', type: 'MACHINE', order: 0 })
+            } catch (err) {
+              // non-fatal: continue attaching others
+            }
+          }
+        }
       }
       onSaved?.()
       onClose()
@@ -98,8 +87,8 @@ export default function CenterForm({ onClose, initialData, onSaved }: CenterForm
       <p className="text-sm text-gray-400">Create or update a modular center.</p>
 
       <div>
-        <label className="block text-sm text-gray-300 mb-2 font-medium">Name <span className="text-xs text-gray-400">(required)</span></label>
-        <input value={name} onChange={e => setName(e.target.value)} placeholder="Center name" className="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 focus:border-[#093FB4] focus:ring-2 focus:ring-[#093FB4]/30 focus:outline-none transition" />
+        <label className="block text-sm text-gray-300 mb-2 font-medium">Title <span className="text-xs text-gray-400">(required)</span></label>
+        <input value={title} onChange={e => setTitle(e.target.value)} placeholder="Center title" className="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 focus:border-[#093FB4] focus:ring-2 focus:ring-[#093FB4]/30 focus:outline-none transition" />
       </div>
 
       <div>
@@ -153,30 +142,6 @@ export default function CenterForm({ onClose, initialData, onSaved }: CenterForm
           </div>
         )}
       </div>
-
-      <div>
-        <label className="inline-flex items-center text-sm text-gray-300">
-          <input type="checkbox" checked={showTraining} onChange={e => setShowTraining(e.target.checked)} className="mr-2" />
-          Add training information (optional)
-        </label>
-      </div>
-
-      {showTraining && (
-        <div className="space-y-4 p-4 bg-gray-800 rounded">
-          <div>
-            <label className="block text-sm text-gray-300 mb-2 font-medium">Training Title</label>
-            <input value={trainingTitle} onChange={e => setTrainingTitle(e.target.value)} placeholder="e.g., Basic Operation" className="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 focus:border-[#093FB4] focus:ring-2 focus:ring-[#093FB4]/30 focus:outline-none transition" />
-          </div>
-          <div>
-            <label className="block text-sm text-gray-300 mb-2 font-medium">Schedule / Notes</label>
-            <input value={trainingSchedule} onChange={e => setTrainingSchedule(e.target.value)} placeholder="e.g., Mon-Fri, 09:00 - 12:00" className="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 focus:border-[#093FB4] focus:ring-2 focus:ring-[#093FB4]/30 focus:outline-none transition" />
-          </div>
-          <div>
-            <label className="block text-sm text-gray-300 mb-2 font-medium">Details</label>
-            <textarea value={trainingDetails} onChange={e => setTrainingDetails(e.target.value)} placeholder="Additional training details (optional)" className="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 focus:border-[#093FB4] focus:ring-2 focus:ring-[#093FB4]/20 focus:outline-none transition resize-none" rows={3} />
-          </div>
-        </div>
-      )}
 
       <div className="flex space-x-3">
         <button type="submit" disabled={loading} className="flex-1 py-3 bg-linear-to-r from-[#DC2626] to-[#B21C1C] rounded-lg font-semibold flex items-center justify-center space-x-2 hover:shadow-lg transition shadow-md disabled:opacity-50">

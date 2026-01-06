@@ -132,24 +132,55 @@ export async function deleteAdmin(id: string) {
   return res.data
 }
 
-// Modular centers (public endpoints)
+// Modular centers (admin endpoints)
 export async function fetchCenters() {
-  const res = await api.get('/centers')
+  const res = await api.get('/admin/modular-centers')
   return res.data
 }
 
 export async function createCenter(payload: any) {
-  const res = await api.post('/centers', payload)
+  const res = await api.post('/admin/modular-centers', payload)
   return res.data
 }
 
 export async function updateCenter(id: string, payload: any) {
-  const res = await api.put(`/centers/${id}`, payload)
+  const res = await api.put(`/admin/modular-centers/${id}`, payload)
   return res.data
 }
 
 export async function deleteCenter(id: string) {
-  const res = await api.delete(`/centers/${id}`)
+  const res = await api.delete(`/admin/modular-centers/${id}`)
+  return res.data
+}
+
+// Single center
+export async function fetchCenter(id: string) {
+  const res = await api.get(`/admin/modular-centers/${id}`)
+  return res.data
+}
+
+// Center images
+export async function fetchCenterImages(centerId: string) {
+  const res = await api.get(`/admin/modular-centers/${centerId}/images`)
+  return res.data
+}
+
+export async function addCenterImage(centerId: string, payload: any) {
+  try {
+    const res = await api.post(`/admin/modular-centers/${centerId}/images`, payload)
+    return res.data
+  } catch (error) {
+    console.log({ centerImageUploadError: error })
+  }
+}
+
+export async function updateCenterImage(centerId: string, imageId: string, payload: any) {
+  const res = await api.put(`/admin/modular-centers/${centerId}/images/${imageId}`, payload)
+  return res.data
+}
+
+export async function deleteCenterImage(centerId: string, imageId: string) {
+  const res = await api.delete(`/admin/modular-centers/${centerId}/images/${imageId}`)
   return res.data
 }
 

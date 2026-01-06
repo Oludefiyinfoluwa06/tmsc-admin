@@ -5,7 +5,7 @@ import CenterForm from './CenterForm'
 import { fetchCenters, deleteCenter } from '../../api'
 import { useToast } from '../Toast'
 
-type Center = { id: string; name: string; location?: string; description?: string; order?: number; imageUrl?: string }
+type Center = { id: string; title: string; location?: string; description?: string; order?: number; imageUrl?: string }
 
 export default function CenterList({ refreshSignal }: { refreshSignal?: number }) {
   const [items, setItems] = useState<Center[]>([])
@@ -20,11 +20,12 @@ export default function CenterList({ refreshSignal }: { refreshSignal?: number }
       try {
         const data: any = await fetchCenters()
         const list: Center[] = (Array.isArray(data) ? data : []).map((c: any) => ({
-          id: c.id || c._id || String(c.slug || c.name),
-          name: c.name || 'Untitled',
+          id: c.id || c._id || String(c.slug || c.title || c.name),
+          title: c.title || c.name || 'Untitled',
           location: c.location || '',
           description: c.description || '',
           order: typeof c.order === 'number' ? c.order : undefined,
+          imageUrl: c.imageUrl || c.image || null,
         }))
         setItems(list)
       } catch {
@@ -64,13 +65,13 @@ export default function CenterList({ refreshSignal }: { refreshSignal?: number }
               <div className="flex items-center space-x-4">
                 {p.imageUrl ? (
                   <div className="w-16 h-12 bg-gray-800 rounded overflow-hidden">
-                    <img src={p.imageUrl} alt={p.name} className="w-full h-full object-cover" />
+                    <img src={p.imageUrl} alt={p.title} className="w-full h-full object-cover" />
                   </div>
                 ) : (
                   <div className="w-16 h-12 bg-gray-800 rounded flex items-center justify-center text-gray-500">No Image</div>
                 )}
                 <div>
-                  <div className="font-semibold">{p.name}</div>
+                  <div className="font-semibold">{p.title}</div>
                   <div className="text-xs text-gray-400 mt-1">{p.location}</div>
                   {p.description && <div className="text-xs text-gray-400 mt-1">{p.description}</div>}
                 </div>
