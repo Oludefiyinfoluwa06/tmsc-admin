@@ -15,18 +15,32 @@ export default function CenterList({ refreshSignal }: { refreshSignal?: number }
   const toast = useToast()
 
   function load() {
-    setLoading(true)
-    ;(async () => {
+    setLoading(true);
+    (async () => {
       try {
+        const baseUrl = import.meta.env.VITE_API_BASE_URL.replace(/\/$/, '')
+
         const data: any = await fetchCenters()
-        const list: Center[] = (Array.isArray(data) ? data : []).map((c: any) => ({
-          id: c.id || c._id || String(c.slug || c.title || c.name),
-          title: c.title || c.name || 'Untitled',
-          location: c.location || '',
-          description: c.description || '',
-          order: typeof c.order === 'number' ? c.order : undefined,
-          imageUrl: c.imageUrl || c.image || null,
-        }))
+
+        const list: Center[] = (Array.isArray(data) ? data : []).map((c: any) => {
+          const rawImageUrl = c.images?.[0]?.imageUrl
+
+          const imageUrl = rawImageUrl
+            ? rawImageUrl.startsWith('http')
+              ? rawImageUrl
+              : `${baseUrl}/${rawImageUrl.replace(/^\//, '')}`
+            : undefined
+
+          return {
+            id: c.id || c._id || String(c.slug || c.title || c.name),
+            title: c.title || c.name || 'Untitled',
+            location: c.location || '',
+            description: c.description || '',
+            order: typeof c.order === 'number' ? c.order : undefined,
+            imageUrl,
+          }
+        })
+
         setItems(list)
       } catch {
         setItems([])
