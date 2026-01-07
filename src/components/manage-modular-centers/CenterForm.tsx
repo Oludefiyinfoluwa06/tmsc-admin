@@ -115,7 +115,7 @@ export default function CenterForm({ onClose, initialData, onSaved }: CenterForm
             const files = e.target.files
             if (files && files.length) setSelectedFiles(Array.from(files))
           }} />
-          <p className="text-sm text-gray-400">Click or drag to upload (optional)</p>
+          <p className="text-sm text-gray-400">Click or drag to upload</p>
         </div>
 
         {/* Previews */}
