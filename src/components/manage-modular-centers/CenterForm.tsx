@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Upload } from 'lucide-react'
 import Spinner from '../Spinner'
 import { useToast } from '../Toast'
-import { createCenter, updateCenter, uploadGalleryFiles, addCenterImage } from '../../api'
+import { createCenter, updateCenter, uploadCenterImage } from '../../api'
 
 interface CenterFormProps {
   onClose: () => void
@@ -56,19 +56,17 @@ export default function CenterForm({ onClose, initialData, onSaved }: CenterForm
         toast.show('Center created', 'success')
       }
 
-      // After creating/updating, upload images (if any) and attach to center
-      const files = selectedFiles.length ? selectedFiles : fileRef.current?.files
-      if (centerId && files && (files as any).length > 0) {
-        const uploaded: any = await uploadGalleryFiles(files as any)
-        const arr = Array.isArray(uploaded) ? uploaded : [uploaded]
-        for (const first of arr) {
-          const imageUrl = first?.url || first?.path || first || null
-          if (imageUrl) {
-            try {
-              await addCenterImage(centerId, { imageUrl, caption: '', type: 'MACHINE', order: 0 })
-            } catch (err) {
-              // non-fatal: continue attaching others
-            }
+      // After creating/updating, upload files (if any) directly to the center images endpoint
+      const fileList: File[] = []
+      if (selectedFiles && selectedFiles.length) fileList.push(...selectedFiles)
+      else if (fileRef.current?.files && fileRef.current.files.length) fileList.push(...Array.from(fileRef.current.files))
+
+      if (centerId && fileList.length > 0) {
+        for (const f of fileList) {
+          try {
+            await uploadCenterImage(centerId, f, { caption: '', type: 'MACHINE', order: 0, isActive: true })
+          } catch (err) {
+            // non-fatal: continue uploading others
           }
         }
       }
@@ -117,7 +115,7 @@ export default function CenterForm({ onClose, initialData, onSaved }: CenterForm
             const files = e.target.files
             if (files && files.length) setSelectedFiles(Array.from(files))
           }} />
-          <p className="text-sm text-gray-400">Click or drag to upload (optional)</p>
+          <p className="text-sm text-gray-400">Click or drag to upload</p>
         </div>
 
         {/* Previews */}

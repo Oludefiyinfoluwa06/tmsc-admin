@@ -7,6 +7,31 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 })
 
+// Redirect to login on 401 responses
+api.interceptors.response.use(
+  (res) => res,
+  (error) => {
+    const status = error?.response?.status
+    if (status === 401) {
+      try {
+        delete api.defaults.headers.common['Authorization']
+      } catch (e) {}
+      try {
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('admin_token')
+        }
+      } catch (e) {}
+      if (typeof window !== 'undefined') {
+        const loginPath = '/login'
+        if (window.location.pathname !== loginPath) {
+          window.location.replace(loginPath)
+        }
+      }
+    }
+    return Promise.reject(error)
+  }
+)
+
 export function setToken(token: string | null) {
   if (token) api.defaults.headers.common['Authorization'] = `Bearer ${token}`
   else delete api.defaults.headers.common['Authorization']
@@ -166,12 +191,26 @@ export async function fetchCenterImages(centerId: string) {
 }
 
 export async function addCenterImage(centerId: string, payload: any) {
-  try {
-    const res = await api.post(`/admin/modular-centers/${centerId}/images`, payload)
-    return res.data
-  } catch (error) {
-    console.log({ centerImageUploadError: error })
-  }
+  const res = await api.post(`/admin/modular-centers/${centerId}/images`, payload)
+  return res.data
+}
+
+// Upload a single image file for a center using multipart/form-data
+export async function uploadCenterImage(centerId: string, file: File, payload: any = {}) {
+  const form = new FormData()
+  form.append('file', file)
+  if (payload.caption !== undefined) form.append('caption', String(payload.caption))
+  if (payload.type !== undefined) form.append('type', String(payload.type))
+  if (payload.order !== undefined) form.append('order', String(payload.order))
+  form.append('isActive', String(payload.isActive))
+  if (payload.imageUrl !== undefined) form.append('imageUrl', String(payload.imageUrl))
+
+  const res = await api.post(`/admin/modular-centers/${centerId}/images`, form, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  })
+  return res.data
 }
 
 export async function updateCenterImage(centerId: string, imageId: string, payload: any) {
